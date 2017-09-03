@@ -1,0 +1,17 @@
+logs:
+  - dir: ${props:LOG_DIR}/system/logs
+    glob: "*.log"
+    encoding: iso-8859-1
+    clean: true
+    create:
+      permissions: 750
+      owner: joerg
+    lines:
+    - pattern: "([0-9]{4}-[0-9]{2}-[0-9]{2}) ([a-zA-Z]) (.*)"
+      skip: false
+      fields:
+        date: "$1, date, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd HH:mm:ss"
+        level: $2
+        msg: $3
+forwarder:
+  port: 2000

@@ -1,0 +1,1 @@
+include ':cube-logkeeper-core', ':cube-logkeeper-loggers', ':cube-logkeeper-web-test', ':cube-logkeeper-slf4j', ':cube-logkeeper-watcher'

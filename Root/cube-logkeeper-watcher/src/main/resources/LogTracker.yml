@@ -1,0 +1,17 @@
+logs:
+  - dir: /Users/joerg/tmp/log
+    glob: "*.log"
+    encoding: iso-8859-1
+    clean: true
+    source: JMS
+    type: tomcat80-stdout
+    create:
+      permissions: 770
+      owner: joerg
+    lines:
+    - pattern: "([0-9]{4}-[0-9]{2}-[0-9]{2}) ([a-zA-Z]) (.*)"
+      skip: false
+      fields:
+        date: "$1, date, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd HH:mm:ss"
+        level: $2
+        msg: $3

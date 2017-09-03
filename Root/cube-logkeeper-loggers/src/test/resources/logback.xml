@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FORWARDER" class="earth.cube.tools.logkeeper.loggers.logback.ForwardAppender">
+		<application>Tomcat</application>
+		<source>tomcat-stdout</source>
+	</appender>
+
+	<root level="WARN">
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	<logger name="earth.cube.tools.logkeeper.loggers.logback" level="TRACE" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FORWARDER" />
+	</logger>
+
+</configuration>

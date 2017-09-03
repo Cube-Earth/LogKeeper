@@ -1,0 +1,50 @@
+import org.gradle.plugins.ide.eclipse.model.WbResource
+
+description = ""
+
+apply plugin: 'eclipse-wtp'
+apply plugin: 'war'
+
+eclipse {
+	wtp {
+//		pathVariables 'GRADLE_HOME': file('/best/software/gradle'), 'TOMCAT_HOME': file('../tomcat')
+		component {
+      		contextPath = '/cube-logkeeper-web'
+  //    		libConfigurations += [ project(":cube-logkeeper-core").configurations.runtime ]
+//      		libConfigurations += [ project(":cube-logkeeper-core").configurations.tests ]
+      	}
+     }
+}
+
+/*
+eclipse.wtp.component.file.whenMerged { wtpComponent ->
+	wtpComponent.wbModuleEntries.forEach {
+	if(it instanceof WbResource) {
+		println it.sourcePath
+	}
+	}
+//	wtpComponent.wbModuleEntries.removeAll {
+//		it instanceof WbResource && it.sourcePath.startsWith('/src/test')
+//	}
+}
+*/
+
+dependencies {
+	compile project(':cube-logkeeper-core')
+	compile project(':cube-logkeeper-loggers')
+	
+	compile group: 'junit', name: 'junit', version: '4.12'	
+ 	
+    compile group: 'log4j', name: 'log4j', version:'1.2.17'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version:'2.1'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.1'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version:'2.5.0'
+    compile group: 'org.slf4j', name: 'slf4j-api', version:'1.7.21'
+    compile group: 'ch.qos.logback', name: 'logback-core', version:'1.1.7'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version:'1.1.7'
+    
+    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1-b06'
+    
+//    compile project (path: ":cube-logkeeper-core", configuration: 'tests')
+ 
+}
