@@ -20,6 +20,17 @@ subprojects {
 
     sourceCompatibility = 1.7
 	targetCompatibility = 1.7
+	
+/*
+	function addExtra() {
+		configurations { providedCompile }
+	
+		sourceSets.main.compileClasspath += configurations.providedCompile
+		sourceSets.test.compileClasspath += configurations.providedCompile
+		sourceSets.test.runtimeClasspath += configurations.providedCompile
+		eclipse.classpath.plusConfigurations += configurations.providedCompile
+	}
+*/
 
 /*
 task testJar(type: Jar, dependsOn: testClasses) {

@@ -39,4 +39,8 @@ public class TestForwarder implements ILogForwarder {
 		return _msgs.size();
 	}
 
+	public static void clear() {
+		_msgs.clear();
+	}
+
 }
