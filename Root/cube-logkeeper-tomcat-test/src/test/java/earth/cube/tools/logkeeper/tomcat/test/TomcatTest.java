@@ -31,7 +31,7 @@ public class TomcatTest {
 	
 	private static final int PORT = 8085;
 	
-	private static Path _catalinaHome = Paths.get("/Users/joerg/servers/apache-tomcat-8.5.9");
+	private static Path _catalinaHome = Paths.get(System.getenv("CATALINA_HOME") == null ? "/Applications/servers/apache-tomcat-8.5.9" : System.getenv("CATALINA_HOME"));
 	private static Path _catalinaBase = Paths.get("./src/main/tomcat");
 	private static Path _tempRootDir = Paths.get("./bin/tomcat");
 	private static List<URL> _urls1 = new ArrayList<>();
