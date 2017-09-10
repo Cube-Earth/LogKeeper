@@ -6,3 +6,5 @@ RemoteSystemsTempFiles/
 Servers/
 Root/*/bin/
 Root/*/target/
+build/
+*/build/

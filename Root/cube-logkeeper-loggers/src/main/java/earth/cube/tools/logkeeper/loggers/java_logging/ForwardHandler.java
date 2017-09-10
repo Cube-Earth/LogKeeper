@@ -18,11 +18,12 @@ public class ForwardHandler extends Handler {
 	private String _sProducer;
 
 	public ForwardHandler() {
-		String sBase = getClass().getPackage().getName();
+		String sBase = getClass().getCanonicalName();
 		LogManager mgr = LogManager.getLogManager();
 		_sApplication = mgr.getProperty(sBase + ".application");
 		_sSource = mgr.getProperty(sBase + ".source");
 		_sProducer = getClass().getSimpleName();
+//	   setErrorManager(new ErrorManager());
 	}
 	
 	private LogLevel transform(Level level) {
@@ -68,18 +69,20 @@ public class ForwardHandler extends Handler {
 		msg.setThread(Integer.toString(record.getThreadID()));
 		msg.setType(TYPE);
 		LogDispatcher.add(msg);
-
+//		reportError("msg", null, 1);
 	}
 
 	/* (non-API documentation)
 	 * @see java.util.logging.Handler#flush()
 	 */
 	public void flush() {
+		LogDispatcher.flush();
 	}
 
 	/* (non-API documentation)
 	 * @see java.util.logging.Handler#close()
 	 */
 	public void close() throws SecurityException {
+		LogDispatcher.flush();
 	}
 }

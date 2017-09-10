@@ -1,9 +1,10 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-subprojects { 
+subprojects { Project p ->
 
 	group "earth.cube.logkeeper"
+	version "1.0.0-SNAPSHOT"
 
     apply plugin: 'java'
 	apply plugin: 'eclipse'
@@ -32,7 +33,7 @@ subprojects {
 	}
 */
 
-/*
+
 task testJar(type: Jar, dependsOn: testClasses) {
     baseName = "test-${project.archivesBaseName}"
     from sourceSets.test.output
@@ -46,7 +47,7 @@ configurations {
 artifacts {
     tests testJar
 }
-*/
+
 
 eclipse{
     wtp{
@@ -59,7 +60,7 @@ eclipse{
     
 		maven { url "http://repo.maven.apache.org/maven2" }
   	}
-  
+
     dependencies {
 		compile fileTree(dir: 'lib', include: '**/*.jar')
 		testCompile group: 'junit', name: 'junit', version: '4.12'	
@@ -69,4 +70,53 @@ eclipse{
     	sourceSets*.java.srcDirs*.each { it.mkdirs() }
     	sourceSets*.resources.srcDirs*.each { it.mkdirs() }
   	}
+  	
+  	afterEvaluate {
+            if(project.hasProperty('maven_aware')) {
+				publishing {
+			    	publications {
+			        	mavenJava(MavenPublication) {
+			            	from components.java
+			
+			 				artifact sourceJar
+							artifact packageJavadoc
+						}
+					}
+			  	}
+			  	
+				javadoc {
+					source = sourceSets.main.allJava
+					classpath = configurations.compileClasspath
+					
+					exclude '*Impl.java'
+				
+				  	options
+				  	{
+				    	setMemberLevel JavadocMemberLevel.PUBLIC
+				    	setAuthor true
+				
+				    	links "https://docs.oracle.com/javase/8/docs/api/"
+				 	}
+				}
+				
+				task sourceJar(type: Jar) {
+				  classifier = 'sources'
+				  from sourceSets.main.allJava
+				}
+				
+				task packageJavadoc(type: Jar) {
+				    from javadoc
+				    classifier = 'javadoc'
+				} 	
+    	}
+  	}
+  	
+  	configure(subprojects.findAll {it.hasProperty('publish')}) {
+            println 'x $it.name'
+    hello {
+            println '- I love to spend time in the arctic waters.'
+        }
+    }
+
+
 }

@@ -18,14 +18,14 @@ public class Slf4jLogger {
 	}
 	
 	public void check(TestZmqServer svr) {
-		LogMessage msg = svr.findMessage("{10}");
+		LogMessage msg = svr.findMessageAndPurge("{10}");
 		Assert.assertEquals(LogLevel.DEBUG, msg.getLevel());
 		Assert.assertEquals("log: message to slf4j logger {10}", msg.getMessage());
 		Assert.assertNull(msg.getThrowable());
 		Assert.assertNull(msg.getThrowableStackTrace());
 		Assert.assertEquals("tomcat-logback", msg.getSource());
 		
-		msg = svr.findMessage("{11}");
+		msg = svr.findMessageAndPurge("{11}");
 		Assert.assertEquals(LogLevel.ERROR, msg.getLevel());
 		Assert.assertEquals("log: message to slf4j logger {11}", msg.getMessage());
 		Assert.assertNull(msg.getThrowable());

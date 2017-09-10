@@ -66,7 +66,7 @@ public class TestZmqServer implements Runnable, Closeable {
 		return _msgs;
 	}
 	
-	public LogMessage findMessage(String sMarker) {
+	public LogMessage findMessageAndPurge(String sMarker) {
 		LogMessage msg = null;
 		do {
 			if(msg != null)
@@ -79,6 +79,16 @@ public class TestZmqServer implements Runnable, Closeable {
 		}
 		while(!msg.getMessage().contains(sMarker));
 		return msg;
+	}
+
+	public LogMessage findMessage(String sMarker) {
+		LogMessage msg = null;
+		for(int i = _msgs.size() - 1; i >= 0; i--) {
+			msg = _msgs.get(i);
+			if(msg.getMessage().contains(sMarker))
+				return msg;
+		}
+		throw new IllegalStateException(String.format("missing log message: %s", sMarker));
 	}
 
 }

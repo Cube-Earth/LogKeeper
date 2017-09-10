@@ -85,14 +85,14 @@ public class StandardLogger {
 	
 	
 	public void check(TestZmqServer svr) {
-		LogMessage msg = svr.findMessage("{4}");
+		LogMessage msg = svr.findMessageAndPurge("{4}");
 		Assert.assertEquals(LogLevel.DEBUG, msg.getLevel());
 		Assert.assertEquals("log: message to java util logger {4}", msg.getMessage());
 		Assert.assertNull(msg.getThrowable());
 		Assert.assertNull(msg.getThrowableStackTrace());
 		Assert.assertEquals("tomcat-logging", msg.getSource());
 		
-		msg = svr.findMessage("{5}");
+		msg = svr.findMessageAndPurge("{5}");
 		Assert.assertEquals(LogLevel.ERROR, msg.getLevel());
 		Assert.assertEquals("log: message to java util logger {5}", msg.getMessage());
 		Assert.assertNull(msg.getThrowable());

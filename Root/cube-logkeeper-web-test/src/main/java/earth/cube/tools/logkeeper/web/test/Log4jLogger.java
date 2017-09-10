@@ -17,14 +17,14 @@ public class Log4jLogger {
 	}
 
 	public void check(TestZmqServer svr) {
-		LogMessage msg = svr.findMessage("{6}");
+		LogMessage msg = svr.findMessageAndPurge("{6}");
 		Assert.assertEquals(LogLevel.DEBUG, msg.getLevel());
 		Assert.assertEquals("log: message to log4j logger {6}", msg.getMessage());
 		Assert.assertNull(msg.getThrowable());
 		Assert.assertNull(msg.getThrowableStackTrace());
 		Assert.assertEquals("tomcat-log4j", msg.getSource());
 		
-		msg = svr.findMessage("{7}");
+		msg = svr.findMessageAndPurge("{7}");
 		Assert.assertEquals(LogLevel.ERROR, msg.getLevel());
 		Assert.assertEquals("log: message to log4j logger {7}", msg.getMessage());
 		Assert.assertNull(msg.getThrowable());

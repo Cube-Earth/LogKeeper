@@ -1,4 +1,4 @@
-package earth.cube.tools.logkeeper.loggers.tomcat;
+package earth.cube.tools.logkeeper.tomcat;
 
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;

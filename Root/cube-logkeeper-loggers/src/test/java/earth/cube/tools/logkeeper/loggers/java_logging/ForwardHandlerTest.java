@@ -4,6 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import earth.cube.tools.logkeeper.core.LogLevel;
@@ -15,9 +16,17 @@ public class ForwardHandlerTest {
 
 	private final Logger _log = Logger.getLogger(getClass().getName());
 	
-	static {
+	@BeforeClass
+	public static void setUp() {
 		System.setProperty("logkeeper.forwarder", TestForwarder.class.getCanonicalName());
-		System.setProperty("java.util.logging.config.file", "src/test/resources/logging.properties");
+		System.setProperty("java.util.logging.config.file", "./src/test/resources/logging_test.properties");
+		/*
+		try {
+			LogManager.getLogManager().readConfiguration(new FileInputStream("./src/test/resources/logging_test.properties"));
+		} catch (SecurityException | IOException e) {
+			throw new IllegalStateException(e);
+		}
+		*/
 	}
 	
 	private void waitForwarded() throws InterruptedException {

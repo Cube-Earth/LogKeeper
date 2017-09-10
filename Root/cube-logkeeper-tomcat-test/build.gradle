@@ -1,0 +1,7 @@
+ext.maven_aware=true
+
+dependencies {
+	compile project(':cube-logkeeper-loggers')
+ 
+	compileOnly group: 'org.apache.tomcat', name: 'tomcat-servlet-api', version: '8.5.9'
+}

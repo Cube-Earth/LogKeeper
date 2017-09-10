@@ -29,14 +29,14 @@ public class Log4j2Logger {
 	}
 	
 	public void check(TestZmqServer svr) {
-		LogMessage msg = svr.findMessage("{8}");
+		LogMessage msg = svr.findMessageAndPurge("{8}");
 		Assert.assertEquals(LogLevel.DEBUG, msg.getLevel());
 		Assert.assertEquals("log: message to log4j2 logger {8}", msg.getMessage());
 		Assert.assertNull(msg.getThrowable());
 		Assert.assertNull(msg.getThrowableStackTrace());
 		Assert.assertEquals("tomcat-log4j2", msg.getSource());
 		
-		msg = svr.findMessage("{9}");
+		msg = svr.findMessageAndPurge("{9}");
 		Assert.assertEquals(LogLevel.ERROR, msg.getLevel());
 		Assert.assertEquals("log: message to log4j2 logger {9}", msg.getMessage());
 		Assert.assertNull(msg.getThrowable());
