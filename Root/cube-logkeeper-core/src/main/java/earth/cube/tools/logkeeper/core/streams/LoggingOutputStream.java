@@ -10,7 +10,7 @@ import earth.cube.tools.logkeeper.core.utils.DynamicByteArray;
 
 public class LoggingOutputStream extends OutputStream implements IMessageCreator {
 	
-	private final static String TYPE = "json";
+	private final static String TYPE = "text";
 	
 	private String _sApplication;
 	private String _sSource;
