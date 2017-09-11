@@ -18,6 +18,14 @@ public class ForwardHandler extends Handler {
 	private String _sProducer;
 
 	public ForwardHandler() {
+		configure(getClass().getCanonicalName());
+	}
+	
+	protected ForwardHandler(String sClassName) {
+		configure(sClassName);
+	}
+
+	private void configure(String sClassName) {
 		String sBase = getClass().getCanonicalName();
 		LogManager mgr = LogManager.getLogManager();
 		_sApplication = mgr.getProperty(sBase + ".application");
