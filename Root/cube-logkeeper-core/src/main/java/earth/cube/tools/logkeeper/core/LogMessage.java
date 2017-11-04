@@ -3,9 +3,7 @@ package earth.cube.tools.logkeeper.core;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -29,7 +27,8 @@ public class LogMessage {
 	private Throwable _t;
 
 	@JsonProperty("date")
-	private LocalDateTime _date;
+//	private LocalDateTime _date;
+	private Date _date;
 	
 	@JsonProperty("application")
 	private String _sApplication; // e.g. JMS
@@ -156,12 +155,14 @@ public class LogMessage {
 		return _sType;
 	}
 
-	public void setDate(LocalDateTime date) {
+//	public void setDate(LocalDateTime date) {
+	public void setDate(Date date) {
 		this._date = date;
 	}
 	
 	public void setDate(long nEpoch) {
-		_date = LocalDateTime.ofInstant(Instant.ofEpochMilli(nEpoch), ZoneId.systemDefault());		
+//		_date = LocalDateTime.ofInstant(Instant.ofEpochMilli(nEpoch), ZoneId.systemDefault());		
+		_date = new Date(nEpoch);
 	}
 
 	public void setThread(String sThread) {

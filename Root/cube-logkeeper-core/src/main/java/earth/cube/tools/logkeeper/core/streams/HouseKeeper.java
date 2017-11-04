@@ -21,14 +21,19 @@ public class HouseKeeper extends Thread {
 	@Override
 	public void run() {
 		Runtime.getRuntime().addShutdownHook(_shutdownHook);
-		
-		while(true) {
-			try {
-				Thread.sleep(_nWaitTime);
-			} catch (InterruptedException e) {
-				break;
+		try {
+			while(true) {
+				try {
+					Thread.sleep(_nWaitTime);
+				} catch (InterruptedException e) {
+					break;
+				}
+				StreamRedirector.flushOverdue();
 			}
-			StreamRedirector.flushOverdue();
+		}
+		catch (Throwable t) {
+			t.printStackTrace();
+			throw t;
 		}
 	}
 

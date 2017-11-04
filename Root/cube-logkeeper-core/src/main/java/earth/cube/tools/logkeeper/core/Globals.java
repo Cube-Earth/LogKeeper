@@ -1,10 +1,11 @@
 package earth.cube.tools.logkeeper.core;
 
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
 
 public class Globals {
 
-	public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss.SSS");
+//	public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss.SSS");
+	public static final SimpleDateFormat DTF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
 	public static final String ZMQ_HOST = "127.0.0.1";
 	

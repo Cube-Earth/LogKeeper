@@ -29,6 +29,7 @@ public class TestZmqServer implements Runnable, Closeable {
         while(true) {
             String s = socket.recvStr ();
             ServerAction action = RequestedServerAction.probe(s);
+            System.out.println("" + action);
             if(action == ServerAction.QUIT)
             	break;
             if(action == ServerAction.NONE) {

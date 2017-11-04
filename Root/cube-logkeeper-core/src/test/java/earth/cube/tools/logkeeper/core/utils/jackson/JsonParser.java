@@ -2,7 +2,7 @@ package earth.cube.tools.logkeeper.core.utils.jackson;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.DeserializationConfig;
@@ -22,8 +22,10 @@ public class JsonParser {
 	    {
 	      @Override
 	      public JsonDeserializer<?> modifyDeserializer(DeserializationConfig config, BeanDescription beanDesc, JsonDeserializer<?> deserializer) {
-	        if (LocalDateTime.class.isAssignableFrom(beanDesc.getBeanClass()))
-		          return new LocalDateTimeDeserializer();
+//	        if (LocalDateTime.class.isAssignableFrom(beanDesc.getBeanClass()))
+//		          return new LocalDateTimeDeserializer();
+	        if (Date.class.isAssignableFrom(beanDesc.getBeanClass()))
+	          return new DateDeserializer();
  	        else
 		        if (Path.class.isAssignableFrom(beanDesc.getBeanClass()))
 		        	return new PathDeserializer();

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
 
-import earth.cube.tools.logkeeper.core.Globals;
 import earth.cube.tools.logkeeper.core.LogMessage;
 
 public class LogDispatcher extends Thread {
@@ -19,9 +18,23 @@ public class LogDispatcher extends Thread {
 	
 
 	static {
-		_instance = new LogDispatcher(create());
-		_instance.start();
-		init();
+		try {
+			_instance = new LogDispatcher(create());
+			_instance.start();
+			init();
+		}
+		catch(Throwable t) {
+			t.printStackTrace();
+			throw t;
+		}
+	}
+	
+	/** For JUnit tests only.
+	 */
+	public static void reinitalize() throws IOException {
+		_instance._forwarder.close();
+		_instance._forwarder = create();
+		_instance._forwarder.connect();
 	}
 	
 	private static void init() {
@@ -34,25 +47,7 @@ public class LogDispatcher extends Thread {
 	}
 	
 	private static ILogForwarder create() {
-		String sHostName = System.getenv("LOG_KEEPER_HOST");
-		if(sHostName == null)
-			sHostName = Globals.ZMQ_HOST;
-		String s = System.getenv("LOG_KEEPER_PORT");
-		int nPort = s == null ? Globals.ZMQ_PORT : Integer.parseInt(s); 
-		String sClass = System.getProperty("logkeeper.forwarder");
-		ILogForwarder forwarder;
-			if(sClass == null)
-				forwarder = new ZmqForwarder();
-			else {
-				try {
-				Class<?> c = Thread.currentThread().getContextClassLoader().loadClass(sClass);
-				forwarder = (ILogForwarder) c.newInstance();
-			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-				throw new IllegalStateException(e);
-			}
-		}
-		forwarder.setConnectInfo(sHostName, nPort);
-		return forwarder;
+		return LogForwarderFactory.create();
 	}
 	
 	public static LogDispatcher get() {
@@ -89,6 +84,9 @@ public class LogDispatcher extends Thread {
 				_forwarder.forward(_msgs.take());
 			}
 		} catch (InterruptedException e) {
+		} catch (Throwable t) {
+			t.printStackTrace();
+			throw t;
 		}
 		finally {
 			while(!_msgs.isEmpty()) {
@@ -114,7 +112,13 @@ public class LogDispatcher extends Thread {
 			} catch (InterruptedException e) {
 				throw new IllegalStateException(e);
 			}
-		}		
+		}
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			throw new IllegalStateException(e);
+		}
+
 	}
 
 }

@@ -4,12 +4,14 @@ apply plugin: 'eclipse'
 subprojects { Project p ->
 
 	group "earth.cube.logkeeper"
-	version "1.0-beta-1"
+	version "1.0-SNAPSHOT"
 
     apply plugin: 'java'
 	apply plugin: 'eclipse'
 	apply plugin: 'maven'
-  	apply plugin: 'maven-publish'	
+  	apply plugin: 'maven-publish'
+  	apply plugin: 'signing'
+  		
   	
 //  	 apply plugin: 'checkstyle'
   apply plugin: 'eclipse-wtp'
@@ -107,7 +109,59 @@ eclipse{
 				task packageJavadoc(type: Jar) {
 				    from javadoc
 				    classifier = 'javadoc'
-				} 	
+				}
+				
+				artifacts {
+					archives sourceJar, packageJavadoc
+				}
+				
+				signing {
+    				sign configurations.archives
+    			}
+    			
+				uploadArchives {
+				  repositories {
+				    mavenDeployer {
+				      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+				
+				      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				        authentication(userName: ossrhUsername, password: ossrhPassword)
+				      }
+				
+				      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+				        authentication(userName: ossrhUsername, password: ossrhPassword)
+				      }
+				
+				      pom.project {
+
+				        description 'Java project for propagating log messages via ZMQ to an ELK stack.'
+				        url 'https://github.com/Cube-Earth/LogKeeper'
+				
+				        scm {
+				          connection 'scm:git:https://github.com/Cube-Earth/LogKeeper'
+				          developerConnection 'scm:git:https://github.com/Cube-Earth/LogKeeper'
+				          url 'https://github.com/Cube-Earth/LogKeeper'
+				        }
+				
+				        licenses {
+				          license {
+				            name 'The Apache License, Version 2.0'
+				            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+				          }
+				        }
+				
+				        developers {
+				          developer {
+				            id 'Necromancer'
+				            name 'Necromancer'
+				            email 'necromancer@cube.earth'
+				          }
+				        }
+				      }
+				    }
+				  }
+				}    			
+    			 	
     	}
   	}
   	

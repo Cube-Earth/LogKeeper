@@ -2,7 +2,7 @@ package earth.cube.tools.logkeeper.core.streams;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import earth.cube.tools.logkeeper.core.LogLevel;
 import earth.cube.tools.logkeeper.core.LogMessage;
@@ -10,7 +10,7 @@ import earth.cube.tools.logkeeper.core.utils.DynamicByteArray;
 
 public class LoggingOutputStream extends OutputStream implements IMessageCreator {
 	
-	private final static String TYPE = "text";
+	private final static String TYPE = "json";
 	
 	private String _sApplication;
 	private String _sSource;
@@ -45,7 +45,8 @@ public class LoggingOutputStream extends OutputStream implements IMessageCreator
 	
 	public LogMessage createMessage() {
 		LogMessage msg = new LogMessage();
-		msg.setDate(LocalDateTime.now());
+//		msg.setDate(LocalDateTime.now());
+		msg.setDate(new Date());
 		msg.setApplication(_sApplication);
 		msg.setLevel(LogLevel.INFO);
 		msg.setLoggerName(_sLoggerName);

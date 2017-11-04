@@ -1,7 +1,7 @@
 package earth.cube.tools.logkeeper.core.utils.jackson;
 
 import java.nio.file.Path;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,8 +22,10 @@ public class JsonEmitter {
 	    module.setSerializerModifier(new BeanSerializerModifier()
 	    {
 	      @Override public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-	        if (LocalDateTime.class.isAssignableFrom(beanDesc.getBeanClass()))
-		          return new LocalDateTimeSerializer();
+//	        if (LocalDateTime.class.isAssignableFrom(beanDesc.getBeanClass()))
+		        if (Date.class.isAssignableFrom(beanDesc.getBeanClass()))
+//		          return new LocalDateTimeSerializer();
+		          return new DateSerializer();
  	        else
 		        if (Path.class.isAssignableFrom(beanDesc.getBeanClass()))
 		        	return new PathSerializer();
