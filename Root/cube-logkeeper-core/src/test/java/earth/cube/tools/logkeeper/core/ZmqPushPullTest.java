@@ -22,9 +22,12 @@ public class ZmqPushPullTest {
 	        ZMQ.Socket socket = context.socket(ZMQ.XSUB);
 	        socket.bind("tcp://127.0.0.1:2120");
 	        _serverReady.release();
-            _t = socket.recvStr ();
+	        System.out.println("Server started");
+            _t = socket.recvStr();
+	        System.out.println("Server received data");
 	        socket.close ();
 	        context.term ();		
+	        System.out.println("Server stopped");
 	    }
 		
 	}
@@ -34,6 +37,7 @@ public class ZmqPushPullTest {
 
 		@Override
 		public void run() {
+	        System.out.println("Server is waiting ...");
 			try {
 				_serverReady.acquire();
 			} catch (InterruptedException e) {
@@ -42,9 +46,12 @@ public class ZmqPushPullTest {
 	        ZMQ.Context context = ZMQ.context(1);
 	        ZMQ.Socket socket = context.socket(ZMQ.PUSH);
 	        socket.connect("tcp://127.0.0.1:2120");
+	        System.out.println("Client started");
 			socket.send(_s);
+	        System.out.println("Client sent data");
 	        socket.close();
 	        context.term();		
+	        System.out.println("Client stopped");
 	    }
 	}
 	

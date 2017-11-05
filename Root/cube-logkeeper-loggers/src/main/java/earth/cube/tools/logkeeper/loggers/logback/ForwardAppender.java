@@ -8,6 +8,7 @@ import ch.qos.logback.core.AppenderBase;
 import earth.cube.tools.logkeeper.core.LogLevel;
 import earth.cube.tools.logkeeper.core.LogMessage;
 import earth.cube.tools.logkeeper.core.forwarders.LogDispatcher;
+import earth.cube.tools.logkeeper.loggers.utils.Producer;
 
 public class ForwardAppender extends AppenderBase<ILoggingEvent> {
 
@@ -15,7 +16,7 @@ public class ForwardAppender extends AppenderBase<ILoggingEvent> {
 	
 	private String _sApplication;
 	private String _sSource;
-	private String _sProducer = getClass().getSimpleName();
+	private String _sProducer = Producer.get(this);
 	
 	public void setApplication(String sApplication) {
 		_sApplication = sApplication;

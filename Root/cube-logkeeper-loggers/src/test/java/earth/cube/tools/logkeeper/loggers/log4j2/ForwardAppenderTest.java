@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import earth.cube.tools.logkeeper.core.LogLevel;
 import earth.cube.tools.logkeeper.core.LogMessage;
-import earth.cube.tools.logkeeper.core.forwarder.TestForwarder;
+import earth.cube.tools.logkeeper.core.forwarders.TestForwarder;
 import earth.cube.tools.logkeeper.loggers.log4j2.ForwardAppender;
 
 public class ForwardAppenderTest {

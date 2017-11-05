@@ -1,4 +1,4 @@
-package earth.cube.tools.logkeeper.core;
+package earth.cube.tools.logkeeper.core.forwarders;
 
 import java.io.IOException;
 import java.util.List;
@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import earth.cube.tools.logkeeper.core.LogLevel;
+import earth.cube.tools.logkeeper.core.LogMessage;
 import earth.cube.tools.logkeeper.core.forwarders.LogDispatcher;
 import earth.cube.tools.logkeeper.core.test.zmq.TestZmqServer;
 
@@ -16,8 +18,11 @@ public class ZmqForwarderTest {
 	
 	@BeforeClass
 	public static void setUp() throws IOException {
-		System.clearProperty("logkeeper.agent");
-		LogDispatcher.reinitalize();
+		System.setProperty("logkeeper.host", "192.168.216.198");
+		if(System.getProperty("logkeeper.agent") != null) {
+			System.clearProperty("logkeeper.agent");
+			LogDispatcher.reinitalize();
+		}
 	}
 	
 	

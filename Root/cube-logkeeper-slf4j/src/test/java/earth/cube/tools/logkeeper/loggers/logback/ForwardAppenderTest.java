@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import earth.cube.tools.logkeeper.core.LogLevel;
 import earth.cube.tools.logkeeper.core.LogMessage;
-import earth.cube.tools.logkeeper.core.forwarder.TestForwarder;
+import earth.cube.tools.logkeeper.core.forwarders.TestForwarder;
 import earth.cube.tools.logkeeper.loggers.slf4j.ZmqLogger;
 
 public class ForwardAppenderTest {

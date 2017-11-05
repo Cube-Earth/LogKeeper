@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import earth.cube.tools.logkeeper.core.LogLevel;
 import earth.cube.tools.logkeeper.core.LogMessage;
-import earth.cube.tools.logkeeper.core.forwarder.TestForwarder;
 import earth.cube.tools.logkeeper.core.forwarders.LogDispatcher;
+import earth.cube.tools.logkeeper.core.forwarders.TestForwarder;
 import earth.cube.tools.logkeeper.core.streams.LoggingOutputStream;
 import earth.cube.tools.logkeeper.core.streams.StreamRedirector;
 import earth.cube.tools.logkeeper.core.streams.StreamType;

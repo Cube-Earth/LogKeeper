@@ -1,4 +1,4 @@
-package earth.cube.tools.logkeeper.core.forwarder;
+package earth.cube.tools.logkeeper.core.forwarders;
 
 public class TestForwarderTest {
 	

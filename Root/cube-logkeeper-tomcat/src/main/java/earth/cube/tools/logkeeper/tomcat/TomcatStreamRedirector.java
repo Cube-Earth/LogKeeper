@@ -4,7 +4,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 
-import earth.cube.tools.logkeeper.core.streams.StreamRedirector;
+import earth.cube.tools.logkeeper.delegates.streams.StreamRedirector;
 
 public class TomcatStreamRedirector implements LifecycleListener {
 

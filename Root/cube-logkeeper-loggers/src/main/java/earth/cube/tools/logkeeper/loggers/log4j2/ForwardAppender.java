@@ -17,6 +17,7 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import earth.cube.tools.logkeeper.core.LogLevel;
 import earth.cube.tools.logkeeper.core.LogMessage;
 import earth.cube.tools.logkeeper.core.forwarders.LogDispatcher;
+import earth.cube.tools.logkeeper.loggers.utils.Producer;
 
 @Plugin(name="Forward_Appender", category="Core", elementType="appender", printObject=true)
 public final class ForwardAppender extends AbstractAppender {
@@ -27,7 +28,7 @@ public final class ForwardAppender extends AbstractAppender {
 	
 	private String _sApplication;
 	private String _sSource;
-	private String _sProducer = getClass().getSimpleName();
+	private String _sProducer = Producer.get(this);
 
 	
     protected ForwardAppender(String sName, Filter filter,

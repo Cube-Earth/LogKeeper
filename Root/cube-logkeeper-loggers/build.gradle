@@ -3,12 +3,14 @@ ext.maven_aware=true
 dependencies {
 	compile project(':cube-logkeeper-core')
     compileOnly group: 'log4j', name: 'log4j', version:'1.2.17'
-    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-api', version:'2.1'
-    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.1'
+    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-api', version:'2.9.1'
+    compileOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.9.1'
     compileOnly group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version:'2.5.0'
     compileOnly group: 'org.slf4j', name: 'slf4j-api', version:'1.7.21'
     compileOnly group: 'ch.qos.logback', name: 'logback-core', version:'1.1.7'
     compileOnly group: 'ch.qos.logback', name: 'logback-classic', version:'1.1.7'
+	compileOnly group: 'org.owasp.esapi', name: 'esapi', version: '2.1.0.1'
+	compileOnly group: 'javax.servlet', name: 'servlet-api', version: '2.5'
 }
 
 jar {

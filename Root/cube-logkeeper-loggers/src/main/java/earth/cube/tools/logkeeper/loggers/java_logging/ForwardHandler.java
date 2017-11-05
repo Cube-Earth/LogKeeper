@@ -8,6 +8,7 @@ import java.util.logging.LogRecord;
 import earth.cube.tools.logkeeper.core.LogLevel;
 import earth.cube.tools.logkeeper.core.LogMessage;
 import earth.cube.tools.logkeeper.core.forwarders.LogDispatcher;
+import earth.cube.tools.logkeeper.loggers.utils.Producer;
 
 public class ForwardHandler extends Handler {
 
@@ -15,22 +16,20 @@ public class ForwardHandler extends Handler {
 	
 	private String _sApplication;
 	private String _sSource;
-	private String _sProducer;
+	private String _sProducer = Producer.get(this);
 
 	public ForwardHandler() {
 		configure(getClass().getCanonicalName());
 	}
 	
-	protected ForwardHandler(String sClassName) {
+	public ForwardHandler(String sClassName) {
 		configure(sClassName);
 	}
 
 	private void configure(String sClassName) {
-		String sBase = getClass().getCanonicalName();
 		LogManager mgr = LogManager.getLogManager();
-		_sApplication = mgr.getProperty(sBase + ".application");
-		_sSource = mgr.getProperty(sBase + ".source");
-		_sProducer = getClass().getSimpleName();
+		_sApplication = mgr.getProperty(sClassName + ".application");
+		_sSource = mgr.getProperty(sClassName + ".source");
 //	   setErrorManager(new ErrorManager());
 	}
 	
