@@ -14,6 +14,6 @@ public class PatternDeserializer extends JsonDeserializer<Pattern> {
 	public Pattern deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
 			throws IOException, JsonProcessingException {
 		String s = jsonParser.getText();
-		return s == null || s.length() == 0 ? null : Pattern.compile(s);
+		return s == null || s.length() == 0 ? null : Pattern.compile(s, Pattern.CASE_INSENSITIVE);
 	}
 }

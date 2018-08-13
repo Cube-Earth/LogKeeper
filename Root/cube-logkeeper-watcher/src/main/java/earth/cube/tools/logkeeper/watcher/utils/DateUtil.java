@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 public class DateUtil {
 
@@ -14,6 +15,10 @@ public class DateUtil {
 	
 	public static LocalDateTime nowUtc() {
 		return LocalDateTime.now(ZoneOffset.UTC);
+	}
+	
+	public static Date toDate(LocalDateTime ldt) {
+		return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());		
 	}
 	
 }

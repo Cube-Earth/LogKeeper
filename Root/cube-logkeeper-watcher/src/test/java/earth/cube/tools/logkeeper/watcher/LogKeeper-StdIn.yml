@@ -1,0 +1,17 @@
+logs:
+  - stdin: true
+    application: app0
+    type: server log
+    lines:
+    - pattern: "([0-9]{4}-[0-9]{2}-[0-9]{2}) ([a-zA-Z]) (.*)"
+      skip: false
+      fields:
+        date: "${group:1:date:yyyy-MM-dd HH:mm:ss}"
+        level: ${group:2}
+        msg: ${group:3}
+    - pattern: "(.*exception.*)"
+      skip: false
+      fields:
+        date: "${func:now}"
+        level: ERROR
+        message: "${group:1}"

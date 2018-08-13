@@ -76,6 +76,7 @@ public class LogMessage {
 		if(_sbMsg.length() > 0)
 			_sbMsg.append('\n');
 		_sbMsg.append(sMsg);
+		_nTimeStamp = System.currentTimeMillis();
 	}
 	
 	public String getMessage() {

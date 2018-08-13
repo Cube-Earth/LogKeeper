@@ -13,5 +13,3 @@ logs:
         date: "$1, date, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd HH:mm:ss"
         level: $2
         msg: $3
-forwarder:
-  port: 2000

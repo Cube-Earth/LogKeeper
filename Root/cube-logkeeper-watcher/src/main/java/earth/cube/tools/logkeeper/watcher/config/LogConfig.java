@@ -21,6 +21,9 @@ import earth.cube.tools.logkeeper.watcher.utils.jackson.IAfterDeserialization;
 public class LogConfig implements IAfterDeserialization {
 	
 	private final Logger _log = LogManager.getLogger(getClass());
+
+	@JsonProperty("stdin")
+	private boolean _bStdIn;
 	
 	@JsonProperty("dir")
 	private Path _dir;
@@ -37,6 +40,9 @@ public class LogConfig implements IAfterDeserialization {
 	@JsonProperty("clean")
 	private boolean _bClean;
 	
+	@JsonProperty("application")
+	private String _sApplication;
+
 	@JsonProperty("source")
 	private String _sSource;
 
@@ -50,6 +56,10 @@ public class LogConfig implements IAfterDeserialization {
 
 	private Pattern _globPattern;
 	
+	
+	public boolean isStdIn() {
+		return _bStdIn;
+	}
 	
 	public Path getDirectory() {
 		return _dir;
@@ -71,6 +81,10 @@ public class LogConfig implements IAfterDeserialization {
 		return _bClean;
 	}
 	
+	public String getApplication() {
+		return _sApplication;
+	}
+
 	public String getSource() {
 		return _sSource;
 	}
@@ -87,9 +101,36 @@ public class LogConfig implements IAfterDeserialization {
 		return _bInvalid;
 	}
 	
+	private String globToRegex(String sGlob) {
+		String sSpecial = "{}[]().*?|\\";
+		StringBuilder sb = new StringBuilder();
+		int n = sGlob.length();
+		for(int i = 0; i < n; i++) {
+			char c = sGlob.charAt(i);
+			switch(c) {
+				case '*':
+					sb.append(".*");
+					break;
+					
+				case '?':
+					sb.append(".");
+					break;
+					
+				default:
+					if(sSpecial.indexOf(c) != -1)
+						sb.append("\\");
+					sb.append(c);
+			}
+		}
+		return sb.toString();
+	}
+	
 	public void afterDeserialization() {
-		_bInvalid = _dir == null || _sGlobPattern == null || _sGlobPattern.length() == 0;
-		_globPattern = Pattern.compile(_sGlobPattern, Pattern.CASE_INSENSITIVE);
+		_bInvalid = !_bStdIn && (_dir == null || _sGlobPattern == null || _sGlobPattern.length() == 0);
+		_bInvalid = _bStdIn && (_dir != null || _sGlobPattern != null);
+		
+		if(_sGlobPattern != null && _sGlobPattern.length() != 0)
+			_globPattern = Pattern.compile(globToRegex(_sGlobPattern), Pattern.CASE_INSENSITIVE);
 	
 		for(LinePatternConfig lineConfig : new ArrayList<>(_pattern))
 			if(lineConfig.isInvalid()) {

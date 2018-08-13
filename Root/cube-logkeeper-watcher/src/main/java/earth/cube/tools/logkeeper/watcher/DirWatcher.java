@@ -28,10 +28,10 @@ public class DirWatcher implements Runnable, Closeable {
 	
 	private WatchService _watcher;
 
-	private LogTracker _tracker;
+	private Application _tracker;
 
 	
-	public DirWatcher(LogTracker logTracker) throws IOException {
+	public DirWatcher(Application logTracker) throws IOException {
 		_tracker = logTracker;
 	}
 

@@ -4,7 +4,7 @@ import java.nio.file.Path;
 
 public class Log {
 
-	public Log(Path log, LogTracker _tracker) {
+	public Log(Path log, Application _tracker) {
 		// TODO Auto-generated constructor stub
 	}
 

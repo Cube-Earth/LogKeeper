@@ -6,18 +6,23 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import earth.cube.tools.logkeeper.watcher.utils.jackson.IAfterDeserialization;
+import earth.cube.tools.logkeeper.watcher.utils.jackson.PatternDeserializer;
 
 public class LinePatternConfig implements IAfterDeserialization {
 	
 	@JsonProperty("pattern")
-//	@JsonDeserialize(using = PatternDeserializer.class)
+	@JsonDeserialize(using = PatternDeserializer.class)
 	private Pattern _textPattern;
 	
 	@JsonProperty("skip")
 	private boolean _bSkip;
 	
+	@JsonProperty("stop")
+	private boolean _bStopEvaluation = true;
+
 	@JsonProperty("fields")
     private Map<String, String> _fields = new HashMap<>();
 	
@@ -32,6 +37,10 @@ public class LinePatternConfig implements IAfterDeserialization {
 		return _bSkip;
 	}
 	
+	public boolean shouldStopEvaluation() {
+		return _bStopEvaluation;
+	}
+
 	public Map<String, String> getFields() {
 		return Collections.unmodifiableMap(_fields);
 	}

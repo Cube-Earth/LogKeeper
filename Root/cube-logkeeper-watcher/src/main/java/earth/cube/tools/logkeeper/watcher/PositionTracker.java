@@ -22,7 +22,7 @@ public class PositionTracker {
 	private ChronicleMap<Path, LogPosition> _map;
 	
 	public PositionTracker(File trackerFile) throws IOException {
-		_map = createBase().createPersistedTo(getFile(trackerFile));
+		_map = createBase().createOrRecoverPersistedTo(getFile(trackerFile));
 	}
 	
 	protected static File getFile(File trackerFile) {
@@ -32,7 +32,9 @@ public class PositionTracker {
 	protected static ChronicleMapBuilder<Path, LogPosition> createBase() {
 		return ChronicleMap
 			    .of(Path.class, LogPosition.class)
-			    .entries(50);
+			    .entries(50)
+			    .averageKeySize(200)
+			    .averageValueSize(5);
 	}
 	
 	public static void recover(Path trackerFile) throws IOException {

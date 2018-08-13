@@ -11,7 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import earth.cube.tools.logkeeper.watcher.DirWatcher;
-import earth.cube.tools.logkeeper.watcher.LogTracker;
+import earth.cube.tools.logkeeper.watcher.Application;
 
 public class LogTest {
 	
@@ -26,7 +26,7 @@ public class LogTest {
 	
 	@Test
 	public void test_1() throws InterruptedException, IOException {
-		LogTracker tracker = new LogTracker(null, Paths.get(_logDir.toString(),"tracker.tmp"));   // TODO
+		Application tracker = new Application(null, Paths.get(_logDir.toString(),"tracker.tmp"), 15000);   // TODO
 		
 		DirWatcher watcher = new DirWatcher(tracker);
 		watcher.addDir(_logDir);

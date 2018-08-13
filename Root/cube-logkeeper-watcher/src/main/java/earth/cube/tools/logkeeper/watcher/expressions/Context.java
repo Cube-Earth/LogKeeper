@@ -18,7 +18,7 @@ public class Context extends StrLookup<String> {
 	private String _sScope;
 	private DataType _type;
 	private String _sFormat;
-	private DateTimeFormatter _df = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss.SSS");
+	public DateTimeFormatter _df = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss.SSS");
 
 	protected Map<String,StrLookup<String>> _scopes = new HashMap<>();
 	
@@ -26,10 +26,11 @@ public class Context extends StrLookup<String> {
 	public Context() {
 		_scopes.put("sys", new SystemPropertiesLookup());
 		_scopes.put("env", new EnvironmentLookup());
+		_scopes.put("func", new FunctionsLookup(this));
 	}
 	
 	public void addScope(String sScope, StrLookup<String> lookup) {
-		_scopes .put(sScope, lookup);
+		_scopes.put(sScope, lookup);
 	}
 	
 	public String lookup(String sScope, String sName) {

@@ -33,7 +33,7 @@ public class ConfigTest {
 		// TODO delete _logdir recursively
 		
 		System.setProperty("LOG_DIR", _logDir.toString());
-		String sResName = ConfigTest.class.getPackage().getName().replace('.', '/') + "/LogTracker.yml";
+		String sResName = ConfigTest.class.getPackage().getName().replace('.', '/') + "/LogKeeper.yml";
 		_config = Config.read(ConfigTest.class.getClassLoader().getResourceAsStream(sResName));
 		Assert.assertNotNull(_config);
 	}

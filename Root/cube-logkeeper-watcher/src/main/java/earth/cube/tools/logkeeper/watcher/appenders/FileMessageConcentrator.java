@@ -1,5 +1,6 @@
 package earth.cube.tools.logkeeper.watcher.appenders;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,10 +15,11 @@ import earth.cube.tools.logkeeper.watcher.events.FileEntry;
 import earth.cube.tools.logkeeper.watcher.expressions.Context;
 import earth.cube.tools.logkeeper.watcher.expressions.MatcherLookup;
 import earth.cube.tools.logkeeper.watcher.utils.BeanUtil;
+import earth.cube.tools.logkeeper.watcher.utils.DateUtil;
 
-public class MessageConcentrator {
+public class FileMessageConcentrator {
 	
-	private static final String PRODUCER = "LogTracker-MultiTail";
+	private static final String PRODUCER = "LogKeeper-MultiTail";
 
 	private static final long TRESHOLD = 500;  // in msec
 	
@@ -26,18 +28,20 @@ public class MessageConcentrator {
 	
 	public void append(LogConfig config, FileEntry fileEntry, String sMsg) {
 		assert(sMsg != null);
-		int nINode = fileEntry.getINode();
-		LogMessage pending = _pending.get(nINode);
-		if(pending != null)
-			if(sMsg.length() > 0 && !Character.isWhitespace(sMsg.charAt(0))) {
-				publish(pending);
-				_pending.put(nINode, create(config, fileEntry, sMsg));
-			}
+		synchronized(this) {
+			int nINode = fileEntry.getINode();
+			LogMessage pending = _pending.get(nINode);
+			if(pending != null)
+				if(sMsg.length() > 0 && !Character.isWhitespace(sMsg.charAt(0))) {
+					publish(pending);
+					_pending.put(nINode, create(config, fileEntry, sMsg));
+				}
+				else
+					pending.appendMsg(sMsg);
 			else
-				pending.appendMsg(sMsg);
-		else
-			if(sMsg.length() != 0)
-				_pending.put(nINode, create(config, fileEntry, sMsg));
+				if(sMsg.length() != 0)
+					_pending.put(nINode, create(config, fileEntry, sMsg));
+		}
 	}
 	
 
@@ -48,8 +52,10 @@ public class MessageConcentrator {
 		msg.appendMsg(sMsg);
 		msg.setProducer(PRODUCER);
 		msg.setFilePath(fileEntry.getOriginalPath());
+		msg.setSource(config.getApplication());		
 		msg.setSource(config.getSource());
 		msg.setType(config.getType());
+		msg.setLoggerName("main");
 
 		for(LinePatternConfig lpc : config.getLineRules()) {
 			Matcher m = lpc.getTextPattern().matcher(sMsg);
@@ -58,9 +64,13 @@ public class MessageConcentrator {
 				ctx.addScope("group", new MatcherLookup(m));
 				for(Entry<String, String> fieldEntry : lpc.getFields().entrySet()) {
 					String sValue = ctx.resolve(fieldEntry.getValue());
-					BeanUtil.set(msg, fieldEntry.getKey(), sValue);
+					if(fieldEntry.getKey().toLowerCase().contains("date"))
+						BeanUtil.set(msg, fieldEntry.getKey(), DateUtil.toDate(LocalDateTime.parse(sValue, ctx.getDateTimeFormatter())));
+					else
+						BeanUtil.set(msg, fieldEntry.getKey(), sValue);
 				}
-				break;
+				if(lpc.shouldStopEvaluation())
+					break;
 			}
 		}
 		
@@ -74,22 +84,28 @@ public class MessageConcentrator {
 	
 	
 	public void flush(FileEntry fileEntry) {
-		int nINode = fileEntry.getINode();
-		LogMessage pending = _pending.get(nINode);
-		if(pending != null) {
-			publish(pending);
-			_pending.remove(nINode);
+		flushOverdue();
+		
+		synchronized(this) {
+			int nINode = fileEntry.getINode();
+			LogMessage pending = _pending.get(nINode);
+			if(pending != null) {
+				publish(pending);
+				_pending.remove(nINode);
+			}
 		}
 	}
 	
 	
-	protected void flushOverdue() {
-		long nCurrTime = System.currentTimeMillis();
-		for(Entry<Integer,LogMessage> e : new HashSet<>(_pending.entrySet())) {
-			LogMessage pending = e.getValue();
-			if(nCurrTime - pending.getTimeStamp() > TRESHOLD) {
-				publish(pending);
-				_pending.remove(e.getKey());
+	public void flushOverdue() {
+		synchronized(this) {
+			long nCurrTime = System.currentTimeMillis();
+			for(Entry<Integer,LogMessage> e : new HashSet<>(_pending.entrySet())) {
+				LogMessage pending = e.getValue();
+				if(nCurrTime - pending.getTimeStamp() > TRESHOLD) {
+					publish(pending);
+					_pending.remove(e.getKey());
+				}
 			}
 		}
 	}
