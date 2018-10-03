@@ -1,5 +1,5 @@
 logs:
-  - dir: /Users/joerg/tmp/log
+  - dir: /Users/user/tmp/log
     glob: "*.log"
     encoding: iso-8859-1
     clean: true
@@ -7,7 +7,7 @@ logs:
     type: tomcat80-stdout
     create:
       permissions: 770
-      owner: joerg
+      owner: user
     lines:
     - pattern: "([0-9]{4}-[0-9]{2}-[0-9]{2}) ([a-zA-Z]) (.*)"
       skip: false
