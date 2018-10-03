@@ -33,27 +33,37 @@ public class ForwardHandler extends Handler {
 //	   setErrorManager(new ErrorManager());
 	}
 	
+	public void setApplication(String sName) {
+		_sApplication = sName;
+	}
+	
+	public void setSource(String sName) {
+		_sSource = sName;
+	}
+
 	private LogLevel transform(Level level) {
 		LogLevel newLevel;
-		if(level == Level.FINEST)
-			newLevel = LogLevel.TRACE;
+
+		if(level.intValue() >= Level.SEVERE.intValue())
+			newLevel = LogLevel.ERROR;
 		else
-			if(level == Level.FINER)
-				newLevel = LogLevel.TRACE;
+			if(level.intValue() >=  Level.WARNING.intValue())
+				newLevel = LogLevel.WARN;
 			else
-				if(level == Level.FINE)
-					newLevel = LogLevel.DEBUG;
+				if(level.intValue() >=  Level.INFO.intValue())
+					newLevel = LogLevel.INFO;
 				else
-					if(level == Level.INFO)
-						newLevel = LogLevel.INFO;
+					if(level.intValue() >=  Level.FINE.intValue())
+						newLevel = LogLevel.DEBUG;
 					else
-						if(level == Level.WARNING)
-							newLevel = LogLevel.WARN;
+						if(level.intValue() >=  Level.FINER.intValue())
+							newLevel = LogLevel.TRACE;
 						else
-							if(level == Level.SEVERE)
-								newLevel = LogLevel.ERROR;
+							if(level.intValue() >=  Level.FINEST.intValue())
+								newLevel = LogLevel.TRACE;
 							else
-								newLevel = LogLevel.UNKNOWN;
+								newLevel = LogLevel.TRACE;
+			
 		return newLevel;
 	}
 
@@ -64,8 +74,13 @@ public class ForwardHandler extends Handler {
 		// ensure that this log record should be logged by this Handler
 		if (!isLoggable(record))
 			return;
+		
+		String sMsg = record.getMessage();
+		if(sMsg != null && record.getParameters() != null)
+			sMsg = String.format(sMsg, record.getParameters());
+		
 		LogMessage msg = new LogMessage();
-		msg.appendMsg(record.getMessage());
+		msg.appendMsg(sMsg);
 		msg.setThrowable(record.getThrown());
 		msg.setDate(record.getMillis());
 		msg.setApplication(_sApplication);
