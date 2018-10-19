@@ -1,6 +1,5 @@
 package earth.cube.tools.logkeeper.watcher;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -25,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import earth.cube.tools.logkeeper.core.forwarders.LogForwarder;
 import earth.cube.tools.logkeeper.watcher.config.Config;
 import earth.cube.tools.logkeeper.watcher.config.LinePatternConfig;
 import earth.cube.tools.logkeeper.watcher.config.LogConfig;
@@ -94,6 +94,7 @@ public class Application {
 	}
 
 	public void run() throws IOException, InterruptedException {
+		LogForwarder.get().connect();
 		_watcher = new DirWatcher(this);
 		_houseKeeper = new HouseKeeper(_nHouseKeepingInterval, this);
 		_houseKeeper.start();
@@ -115,6 +116,7 @@ public class Application {
 			_stdIn.join();
 			// TODO: FileMessageConcentrator interrupt & join
 			flush();
+			LogForwarder.get().close();
 		}
 	}
 
@@ -225,10 +227,10 @@ public class Application {
 
 	public static Options buildOptions() {
 		final Options options = new Options();
-		options.addOption("c", "config", false, "Path to configuration file")
+		options.addOption("c", "config", true, "Path to configuration file")
 				.addOption("r", "recover", false, "recover internal database")
-				.addOption("t", "tracker", false, "Path to tracker file")
-				.addOption("i", "intervall", false, "House keeping interval (in sec)");
+				.addOption("t", "tracker", true, "Path to tracker file")
+				.addOption("i", "intervall", true, "House keeping interval (in sec)");
 		return options;
 	}
 
