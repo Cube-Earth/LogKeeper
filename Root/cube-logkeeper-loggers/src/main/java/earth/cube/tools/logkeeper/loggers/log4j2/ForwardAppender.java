@@ -22,8 +22,6 @@ import earth.cube.tools.logkeeper.loggers.utils.Producer;
 @Plugin(name="Forward_Appender", category="Core", elementType="appender", printObject=true)
 public final class ForwardAppender extends AbstractAppender {
 
-	private static final long serialVersionUID = -9160018092046037088L;
-
 	private final static String TYPE = "json";
 	
 	private String _sApplication;

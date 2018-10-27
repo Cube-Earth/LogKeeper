@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import shaded.org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 public class BeanUtil {
 	
@@ -19,7 +19,7 @@ public class BeanUtil {
 		Method methWithOrigin = null;
 		Method methWithAny = null;
 		Class<?> origin = value != null ? value.getClass() : null;
-		String sMethodName = "set" + StringUtils.capitalise(sPropertyName);
+		String sMethodName = "set" + WordUtils.capitalize(sPropertyName);
 		for(Method m : obj.getClass().getDeclaredMethods()) {
 			Class<?>[] p = m.getParameterTypes();
 			if(p.length == 1 && m.getName().equals(sMethodName)) {
