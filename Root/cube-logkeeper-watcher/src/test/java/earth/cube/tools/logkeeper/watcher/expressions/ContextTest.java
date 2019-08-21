@@ -61,7 +61,7 @@ public class ContextTest {
 		_map.put("d", "12/31/2016 12:30:00");
 		_map.put("s","abc");
 		
-		Assert.assertEquals("#2016-12-31 12:30:00.000#abc#", _ctx.resolve("#${map:d:date:'MM/dd/uuuu HH:mm:ss'}#${map:s:string}#"));
+		Assert.assertEquals("#2016-12-31 12:30:00.000#abc#", _ctx.resolve("#${map:d, date, 'MM/dd/uuuu HH:mm:ss'}#${map:s, string}#"));
 	}
 
 }

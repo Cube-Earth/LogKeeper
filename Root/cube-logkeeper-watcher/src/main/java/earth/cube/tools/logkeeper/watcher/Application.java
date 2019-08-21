@@ -67,8 +67,13 @@ public class Application {
 
 	public Application(Path configFile, Path trackerFile, int nHouseKeeperInterval)
 			throws JsonParseException, JsonMappingException, IOException {
-		_config = Config.read(configFile);
-		HealthCheck.createInstance(_config.getHealthConfig());
+		if(configFile != null) {
+			_config = Config.read(configFile);
+			HealthCheck.createInstance(_config.getHealthConfig());
+		}
+		else
+			HealthCheck.createInstance(null);
+			
 		_positions = new PositionTracker(trackerFile == null ? null : trackerFile.toFile());
 		_nHouseKeepingInterval = nHouseKeeperInterval;
 	}
@@ -140,6 +145,7 @@ public class Application {
 		if(!_bShutdown) {
 			_bShutdown = true;
 			_watcher.close();
+			HealthCheck.getInstance().close();
 			if(_houseKeeper != null)
 				_houseKeeper.quit();
 			flush();

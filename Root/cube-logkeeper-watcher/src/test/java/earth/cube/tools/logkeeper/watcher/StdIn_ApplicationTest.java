@@ -34,6 +34,8 @@ public class StdIn_ApplicationTest {
 	
 	@BeforeClass
 	public static void setUpClass() throws JsonParseException, JsonMappingException, IOException {
+		System.setProperty("logkeeper.agent", TestForwarder.class.getCanonicalName());
+
 		String sConfigPath = "src/test/java/" + StdIn_ApplicationTest.class.getPackage().getName().replace('.', '/') + "/LogKeeper-StdIn.yml";
 		_app = new Application(Paths.get(sConfigPath), null, 1000);
 		new Thread(new Runnable() {
@@ -78,10 +80,9 @@ public class StdIn_ApplicationTest {
 	
 	private void check(LogLevel expectedLevel, String sExpectedMsg, LogMessage m) {
 		Assert.assertEquals("app0", m.getApplication());
-		Assert.assertEquals("stdin", m.getSource());
 		Assert.assertEquals("main", m.getLoggerName());
 		Assert.assertEquals("LogKeeper-StdIn", m.getProducer());
-		Assert.assertEquals("server log", m.getType());
+		Assert.assertEquals("server log", m.getSource());
 		Assert.assertNull(m.getFilePath());
 		Assert.assertEquals(m.getMessage(), "main", m.getThread());
 		Assert.assertEquals(m.getMessage(), expectedLevel, m.getLevel());
