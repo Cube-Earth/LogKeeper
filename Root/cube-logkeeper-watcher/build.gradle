@@ -6,10 +6,11 @@ targetCompatibility = 1.8
 
 dependencies {
 	compile project(':cube-logkeeper-core')
+	compile project(':cube-logkeeper-pipe-sender')
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version:'2.6.2'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.6.2'
     compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.4'
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version:'2.1.3'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version:'2.9.2'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version:'2.8.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.8.0'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version:'2.8.0'

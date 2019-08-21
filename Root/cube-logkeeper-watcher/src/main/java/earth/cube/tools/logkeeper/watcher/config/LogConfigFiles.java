@@ -14,16 +14,12 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 
 import earth.cube.tools.logkeeper.watcher.utils.DirectoryUtils;
 import earth.cube.tools.logkeeper.watcher.utils.FilePermissions;
-import earth.cube.tools.logkeeper.watcher.utils.jackson.IAfterDeserialization;
 
 @JsonRootName("log")
-public class LogConfig implements IAfterDeserialization {
+public class LogConfigFiles extends AbstractLogConfig {
 	
 	private final Logger _log = LogManager.getLogger(getClass());
 
-	@JsonProperty("stdin")
-	private boolean _bStdIn;
-	
 	@JsonProperty("dir")
 	private Path _dir;
 	
@@ -39,27 +35,15 @@ public class LogConfig implements IAfterDeserialization {
 	@JsonProperty("clean")
 	private boolean _bClean;
 	
-	@JsonProperty("application")
-	private String _sApplication;
-
-	@JsonProperty("source")
-	private String _sSource;
-
-	@JsonProperty("type")
-	private String _sType;
-
 	@JsonProperty("lines")
 	private List<LinePatternConfig> _pattern;
 	
-	private boolean _bInvalid;
-
 	private Pattern _globPattern;
 	
-	
-	public boolean isStdIn() {
-		return _bStdIn;
+	public LogConfigFiles() {
+		super(LogConfigType.FILES);
 	}
-	
+		
 	public Path getDirectory() {
 		return _dir;
 	}
@@ -80,24 +64,8 @@ public class LogConfig implements IAfterDeserialization {
 		return _bClean;
 	}
 	
-	public String getApplication() {
-		return _sApplication;
-	}
-
-	public String getSource() {
-		return _sSource;
-	}
-
-	public String getType() {
-		return _sType;
-	}
-
 	public List<LinePatternConfig> getLineRules() {
 		return Collections.unmodifiableList(_pattern);
-	}
-	
-	public boolean isInvalid() {
-		return _bInvalid;
 	}
 	
 	private String globToRegex(String sGlob) {
@@ -124,10 +92,8 @@ public class LogConfig implements IAfterDeserialization {
 		return sb.toString();
 	}
 	
-
 	public void afterDeserialization() {
-		_bInvalid = !_bStdIn && (_dir == null || _sGlobPattern == null || _sGlobPattern.length() == 0);
-		_bInvalid = _bStdIn && (_dir != null || _sGlobPattern != null);
+		super.afterDeserialization();
 		
 		if(_sGlobPattern != null && _sGlobPattern.length() != 0)
 			_globPattern = Pattern.compile(globToRegex(_sGlobPattern), Pattern.CASE_INSENSITIVE);
@@ -140,5 +106,5 @@ public class LogConfig implements IAfterDeserialization {
 		
 		DirectoryUtils.mkdirs(_dir, _perms);
 	}
-	
+
 }

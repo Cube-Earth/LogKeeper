@@ -39,17 +39,26 @@ public class Context extends StrLookup<String> {
 	}
 
 	protected void analyze(String sAtomicExpression) {
-		Pattern p = Pattern.compile("(?:'((?:[^'\\\\]|\\\\.)*)'|((?<!')[^:']+)):?");
-		Matcher m = p.matcher(sAtomicExpression);
+		Pattern p;
+		Matcher m;
+		
+		p = Pattern.compile("(?:([a-zA-Z0-9]+):)?(.*)");
+		m = p.matcher(sAtomicExpression);
+		if(m.find()) {
+			_sScope = m.group(1);
+			sAtomicExpression = m.group(2);
+		}
+		
+		p = Pattern.compile("(?:'((?:[^'\\\\]|\\\\.)*)'|((?<!')[^,']+))(, *)?");
+		m = p.matcher(sAtomicExpression);
 		List<String> parts = new ArrayList<>();
 		while(m.find())
 			parts.add(m.group(1) != null ? m.group(1) : m.group(2));
-		if(parts.size() < 2)
+		if(parts.size() < 1)
 			throw new IllegalArgumentException("Invalid expression '" + sAtomicExpression + "'");
-		_sScope = parts.get(0);
-		_sAssignment = parts.get(1);
-		_type = parts.size() > 2 ? Enum.valueOf(DataType.class, parts.get(2).toUpperCase()) : DataType.STRING;
-		_sFormat = parts.size() > 3 ? parts.get(3) : null;
+		_sAssignment = parts.get(0);
+		_type = parts.size() > 1 ? Enum.valueOf(DataType.class, parts.get(1).toUpperCase()) : DataType.STRING;
+		_sFormat = parts.size() > 2 ? parts.get(2) : null;
 	}
 
 	/**

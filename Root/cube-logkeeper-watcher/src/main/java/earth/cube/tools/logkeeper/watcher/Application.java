@@ -26,8 +26,12 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import earth.cube.tools.logkeeper.core.forwarders.LogForwarder;
 import earth.cube.tools.logkeeper.watcher.config.Config;
+import earth.cube.tools.logkeeper.watcher.config.ILogConfig;
 import earth.cube.tools.logkeeper.watcher.config.LinePatternConfig;
-import earth.cube.tools.logkeeper.watcher.config.LogConfig;
+import earth.cube.tools.logkeeper.watcher.config.LogConfigFiles;
+import earth.cube.tools.logkeeper.watcher.config.LogConfigStructuredPipe;
+import earth.cube.tools.logkeeper.watcher.config.LogConfigTextPipe;
+import earth.cube.tools.logkeeper.watcher.health_check.HealthCheck;
 import earth.cube.tools.logkeeper.watcher.utils.CmdLineArgs;
 import earth.cube.tools.logkeeper.watcher.utils.DateUtil;
 import earth.cube.tools.logkeeper.watcher.utils.ShowHelpException;
@@ -36,7 +40,7 @@ public class Application {
 
 	protected final static String PRODUCER = "LogKeeper-Watcher";
 
-	private static final int DEFAULT_HOUSE_KEEPING_INTERVAL = 15000;
+	public static final int DEFAULT_HOUSE_KEEPING_INTERVAL = 15000;
 
 	protected final Logger _log = LogManager.getLogger(getClass());
 
@@ -52,7 +56,7 @@ public class Application {
 
 	private List<Path> _pendingLogs = new ArrayList<>();
 
-	private StdInConsumer _stdIn;
+	private List<IConsumer> _threads = new ArrayList<>();
 
 	private HouseKeeper _houseKeeper;
 
@@ -64,32 +68,60 @@ public class Application {
 	public Application(Path configFile, Path trackerFile, int nHouseKeeperInterval)
 			throws JsonParseException, JsonMappingException, IOException {
 		_config = Config.read(configFile);
+		HealthCheck.createInstance(_config.getHealthConfig());
 		_positions = new PositionTracker(trackerFile == null ? null : trackerFile.toFile());
 		_nHouseKeepingInterval = nHouseKeeperInterval;
 	}
 
 	private void init() throws IOException {
-		for (LogConfig logConfig : _config.getLogConfigs()) {
-			if (logConfig.isStdIn()) {
-				_stdIn = new StdInConsumer(logConfig);
-			} else {
-				logConfig.mkdirs();
-				_watcher.addDir(logConfig.getDirectory());
-				if (logConfig.shouldClean())
-					try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logConfig.getDirectory(),
-							logConfig.getGlobString())) {
-						directoryStream.forEach(p -> {
-							if (Files.exists(p)) {
-								try {
-									deleteIfNotOpened(p);
-									processUnpublishedLines(p);
-								} catch (IOException e) {
-									_log.warn("init: Exception occurred -->", e);
+		for (ILogConfig logConfig : _config.getLogConfigs()) {
+			switch(logConfig.getConfigType()) {
+			
+				case FILES:
+					LogConfigFiles fileConfig = (LogConfigFiles) logConfig;
+					_watcher.addDir(fileConfig.getDirectory());
+					if (fileConfig.shouldClean())
+						try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(fileConfig.getDirectory(),
+								fileConfig.getGlobString())) {
+							directoryStream.forEach(p -> {
+								if (Files.exists(p)) {
+									try {
+										deleteIfNotOpened(p);
+										processUnpublishedLines(p);
+									} catch (IOException e) {
+										_log.warn("init: Exception occurred -->", e);
+									}
 								}
-							}
-						});
-					}
+							});
+						}
+					break;
+					
+				case PIPE_TEXT:
+					LogConfigTextPipe textPipeConfig = (LogConfigTextPipe) logConfig;
+					_threads.add(new TextPipeConsumer(textPipeConfig));
+					break;
+					
+				case PIPE_STRUCTURED:
+					LogConfigStructuredPipe structuredPipeConfig = (LogConfigStructuredPipe) logConfig;
+					_threads.add(new StructuredPipeConsumer(structuredPipeConfig));
+					break;
+					
 			}
+		}
+	}
+	
+	private void startThreads() {
+		for(IConsumer thread : _threads) {
+			thread.start();
+		}
+	}
+
+	private void stopThreads() throws InterruptedException {
+		for(IConsumer thread : _threads) {
+			thread.interrupt();
+		}
+		for(IConsumer thread : _threads) {
+			thread.join();
 		}
 	}
 
@@ -99,8 +131,7 @@ public class Application {
 		_houseKeeper = new HouseKeeper(_nHouseKeepingInterval, this);
 		_houseKeeper.start();
 		init();
-		if(_stdIn != null)
-			_stdIn.start();
+		startThreads();
 		_houseKeeper.join();
 		close();
 	}
@@ -112,8 +143,7 @@ public class Application {
 			if(_houseKeeper != null)
 				_houseKeeper.quit();
 			flush();
-			_stdIn.interrupt();
-			_stdIn.join();
+			stopThreads();
 			// TODO: FileMessageConcentrator interrupt & join
 			flush();
 			LogForwarder.get().close();
@@ -138,7 +168,7 @@ public class Application {
 
 	}
 
-	private void publishLine(LogConfig logConfig, Path logFile, int nOffs, int nLen, long nNewFilePosition)
+	private void publishLine(LogConfigFiles logConfig, Path logFile, int nOffs, int nLen, long nNewFilePosition)
 			throws IOException {
 		String sLine = new String(_buf, nOffs, nLen, logConfig.getEncoding());
 		sLine = sLine.trim();
@@ -181,14 +211,14 @@ public class Application {
 		_positions.set(logFile, nNewFilePosition);
 	}
 
+
 	private void processUnpublishedLines(Path logFile) throws FileNotFoundException, IOException {
-		LogConfig logConfig = _config.getLogConfig(logFile);
+		LogConfigFiles logConfig = _config.getLogConfig(logFile);
 		if (logConfig == null) {
 			_log.debug("processUnpublishedLines: log file '" + logFile
 					+ "' is not covered by the configuration file and wll be skipped ...");
 			return;
 		}
-		assert (!logConfig.isInvalid());
 
 		_log.debug("processUnpublishedLines: log file '" + logFile + "' is beeing processed ...");
 
@@ -265,10 +295,14 @@ public class Application {
 				String s = cmdLine.getOptionValue("config");
 				configFile = s == null || s.length() == 0 ? null : Paths.get(s);
 			}
-			if (configFile == null)
-				throw new IllegalArgumentException("Path to configuration file is mandatory!");
-			if (!Files.exists(configFile))
-				throw new FileNotFoundException(configFile.toString());
+			if (configFile == null) {
+				String s = System.getProperty("LOGKEEPER_CONFIG");
+				if(s == null || s.length() == 0)
+					throw new IllegalArgumentException("Path to configuration file is mandatory!");
+			}
+			else
+				if (!Files.exists(configFile))
+					throw new FileNotFoundException(configFile.toString());
 
 			Application app = new Application(configFile, trackerFile, nHouseKeepingInterval);
 			app.run();
@@ -286,15 +320,17 @@ public class Application {
 	}
 
 	public void flushOverdue() {
-		if (_stdIn != null)
-			_stdIn.flushOverdue();
+		for(IConsumer thread : _threads) {
+			thread.flushOverdue();
+		}
 
 		// TODO: flushOverdue for FileMessageConcentrator
 	}
 
 	public void flush() {
-		if (_stdIn != null)
-			_stdIn.flush();
+		for(IConsumer thread : _threads) {
+			thread.flush();
+		}
 
 		// TODO: flushOverdue for FileMessageConcentrator
 	}

@@ -7,13 +7,14 @@ import java.util.regex.Matcher;
 import earth.cube.tools.logkeeper.core.LogMessage;
 import earth.cube.tools.logkeeper.core.forwarders.LogForwarder;
 import earth.cube.tools.logkeeper.watcher.config.LinePatternConfig;
-import earth.cube.tools.logkeeper.watcher.config.LogConfig;
+import earth.cube.tools.logkeeper.watcher.config.LogConfigTextPipe;
 import earth.cube.tools.logkeeper.watcher.expressions.Context;
 import earth.cube.tools.logkeeper.watcher.expressions.MatcherLookup;
+import earth.cube.tools.logkeeper.watcher.health_check.HealthCheck;
 import earth.cube.tools.logkeeper.watcher.utils.BeanUtil;
 import earth.cube.tools.logkeeper.watcher.utils.DateUtil;
 
-public class StdInMessageConcentrator {
+public class TextPipeMessageConcentrator {
 	
 	private static final String PRODUCER = "LogKeeper-StdIn";
 
@@ -21,10 +22,10 @@ public class StdInMessageConcentrator {
 	
 	private LogMessage _pending;
 
-	private LogConfig _config;
+	private LogConfigTextPipe _config;
 	
 	
-	public StdInMessageConcentrator(LogConfig config) {
+	public TextPipeMessageConcentrator(LogConfigTextPipe config) {
 		_config = config;
 	}
 	
@@ -64,6 +65,7 @@ public class StdInMessageConcentrator {
 				ctx.addScope("group", new MatcherLookup(m));
 				for(Entry<String, String> fieldEntry : lpc.getFields().entrySet()) {
 					String sValue = ctx.resolve(fieldEntry.getValue());
+					
 					if(fieldEntry.getKey().toLowerCase().contains("date"))
 						BeanUtil.set(msg, fieldEntry.getKey(), DateUtil.toDate(LocalDateTime.parse(sValue, ctx.getDateTimeFormatter())));
 					else
@@ -80,6 +82,7 @@ public class StdInMessageConcentrator {
 	
 	protected void publish(LogMessage msg) {
 		LogForwarder.get().forward(msg);
+		HealthCheck.getInstance().verify(msg);
 	}
 	
 	

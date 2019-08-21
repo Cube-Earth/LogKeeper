@@ -1,11 +1,11 @@
 package earth.cube.tools.logkeeper.watcher.config;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,8 +38,11 @@ public class Config implements IAfterDeserialization {
 	"defaultValue" is only for documentation purposes. 
 */
 	
+	@JsonProperty(value="health_checks")
+	private HealthConfig _healthConfig;
+	
 	@JsonProperty(value="logs")
-	private List<LogConfig> _logConfigs;
+	private List<ILogConfig> _logConfigs;
 	
 	public static Config read(InputStream is) throws JsonParseException, JsonMappingException, IOException {
 		SimpleModule module = new SimpleModule();
@@ -65,30 +68,34 @@ public class Config implements IAfterDeserialization {
 	}
 	
 	public static Config read(Path path) throws JsonParseException, JsonMappingException, IOException {
-		return read(Files.newInputStream(path, StandardOpenOption.READ));
+		InputStream is = path == null ? new ByteArrayInputStream(System.getProperty("LOGKEEPER_CONFIG").getBytes("utf-8")) : Files.newInputStream(path, StandardOpenOption.READ);
+		return read(is);
+	}
+	
+	public HealthConfig getHealthConfig() {
+		return _healthConfig;
 	}
 
-	public List<LogConfig> getLogConfigs() {
+	public List<ILogConfig> getLogConfigs() {
 		return _logConfigs;
 	}
 	
-	public LogConfig getLogConfig(Path logFile) {
+	public LogConfigFiles getLogConfig(Path logFile) {
 		String sDir = logFile.getParent().toString();
 		String sName = logFile.getFileName().toString();
-		for(LogConfig logConfig : _logConfigs)
-			if(sDir.equals(logConfig.getDirectory().toString()) && logConfig.getGlobPattern().matcher(sName).matches())
-				return logConfig;
+		for(ILogConfig logConfig : _logConfigs)
+			if(logConfig.getConfigType() == LogConfigType.FILES) {
+				LogConfigFiles fileConfig = (LogConfigFiles) logConfig;
+				if(sDir.equals(fileConfig.getDirectory().toString()) && fileConfig.getGlobPattern().matcher(sName).matches())
+					return fileConfig;
+			}
 		return null;
 	}
 
 	@Override
 	public void afterDeserialization() {
-		for(LogConfig logConfig : new ArrayList<>(_logConfigs))
-			if(logConfig.isInvalid()) {
-				_log.error("afterDeserialization: configuration entry is invalid and has been removed. directory: {}, glob: {}", logConfig.getDirectory(), logConfig.getGlobString());
-				_logConfigs.remove(logConfig);
-			}
-			
+		if(_healthConfig == null)
+			_healthConfig = new HealthConfig();
 	}
 
 }

@@ -6,5 +6,8 @@
 		<dependent-module deploy-path="../" handle="module:/resource/cube-logkeeper-core/cube-logkeeper-core">
 			<dependency-type>uses</dependency-type>
 		</dependent-module>
+		<dependent-module deploy-path="../" handle="module:/resource/cube-logkeeper-pipe-sender/cube-logkeeper-pipe-sender">
+			<dependency-type>uses</dependency-type>
+		</dependent-module>
 	</wb-module>
 </project-modules>

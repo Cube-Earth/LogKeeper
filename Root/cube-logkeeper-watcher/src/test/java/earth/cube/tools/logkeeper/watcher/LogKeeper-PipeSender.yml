@@ -10,12 +10,12 @@ logs:
       permissions: 750
       owner: joerg
     lines:
-    - pattern: "([0-9]{4}-[0-9]{2}-[0-9]{2}) ([a-zA-Z]) (.*)"
+    - pattern: "([0-9]{4}-[0-9]{2}-[0-9]{2}) ([a-zA-Z]*) (.*)"
       skip: false
       fields:
-        date: "$1, date, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd HH:mm:ss"
-        level: $2
-        msg: $3
+        date: "${group:1, date, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd HH:mm:ss}"
+        level: ${group:2}
+        message: ${group:3}
 
   - application: server2
     source: text1
@@ -26,12 +26,12 @@ logs:
       owner: joerg
     encoding: utf-8
     lines:
-    - pattern: "([0-9]{4}-[0-9]{2}-[0-9]{2}) ([a-zA-Z]) (.*)"
+    - pattern: "([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}) ([a-zA-Z]+) (.*)"
       skip: false
       fields:
-        date: "$1, date, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd HH:mm:ss"
-        level: $2
-        msg: $3
+        date: "${group:1, date, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd HH:mm:ss}"
+        level: ${group:2}
+        message: ${group:3}
 
   - application: server3
     source: structured1

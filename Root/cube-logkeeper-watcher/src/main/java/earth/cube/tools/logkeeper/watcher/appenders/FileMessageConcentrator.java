@@ -1,5 +1,6 @@
 package earth.cube.tools.logkeeper.watcher.appenders;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,10 +11,11 @@ import java.util.regex.Matcher;
 import earth.cube.tools.logkeeper.core.LogMessage;
 import earth.cube.tools.logkeeper.core.forwarders.LogForwarder;
 import earth.cube.tools.logkeeper.watcher.config.LinePatternConfig;
-import earth.cube.tools.logkeeper.watcher.config.LogConfig;
+import earth.cube.tools.logkeeper.watcher.config.LogConfigFiles;
 import earth.cube.tools.logkeeper.watcher.events.FileEntry;
 import earth.cube.tools.logkeeper.watcher.expressions.Context;
 import earth.cube.tools.logkeeper.watcher.expressions.MatcherLookup;
+import earth.cube.tools.logkeeper.watcher.health_check.HealthCheck;
 import earth.cube.tools.logkeeper.watcher.utils.BeanUtil;
 import earth.cube.tools.logkeeper.watcher.utils.DateUtil;
 
@@ -26,7 +28,7 @@ public class FileMessageConcentrator {
 	private Map<Integer,LogMessage> _pending = new HashMap<>();
 	
 	
-	public void append(LogConfig config, FileEntry fileEntry, String sMsg) {
+	public void append(LogConfigFiles config, FileEntry fileEntry, String sMsg) {
 		assert(sMsg != null);
 		synchronized(this) {
 			int nINode = fileEntry.getINode();
@@ -45,7 +47,7 @@ public class FileMessageConcentrator {
 	}
 	
 
-	protected LogMessage create(LogConfig config, FileEntry fileEntry, String sMsg) {
+	protected LogMessage create(LogConfigFiles config, FileEntry fileEntry, String sMsg) {
 		Context ctx = new Context();
 		
 		LogMessage msg = new LogMessage();
@@ -80,6 +82,7 @@ public class FileMessageConcentrator {
 	
 	protected void publish(LogMessage msg) {
 		LogForwarder.get().forward(msg);
+		HealthCheck.getInstance().verify(msg);
 	}
 	
 	

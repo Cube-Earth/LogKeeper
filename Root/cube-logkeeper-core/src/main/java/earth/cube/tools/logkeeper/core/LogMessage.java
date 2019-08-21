@@ -3,10 +3,13 @@ package earth.cube.tools.logkeeper.core;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 
 @JsonPropertyOrder({ "message", "date", "source", "type", "level", "thread", "file_path", "producer", "container_label", "container_category", "compound_id" })
 public class LogMessage {
@@ -71,6 +74,9 @@ public class LogMessage {
 	public LogMessage() {
 	}
 	
+	public LogMessage(Map<String,Object> map) {
+		set(map);
+	}
 	
 	public void appendMsg(String sMsg) {
 		if(_sbMsg.length() > 0)
@@ -165,6 +171,10 @@ public class LogMessage {
 //		_date = LocalDateTime.ofInstant(Instant.ofEpochMilli(nEpoch), ZoneId.systemDefault());		
 		_date = new Date(nEpoch);
 	}
+	
+	public Date getDate() {
+		return _date;
+	}
 
 	public void setThread(String sThread) {
 		this._sThread = sThread;
@@ -203,5 +213,25 @@ public class LogMessage {
 	}
 
 
+	protected void set(Map<String,Object> map) {
+		_sContainerLabel = (String) map.get("container_label");
+		_sContainerCategory = (String) map.get("container_category");
+		_sCompoundId = (String) map.get("compound_id");
+		_sbMsg = new StringBuilder((String) map.get("message"));
+		_sThrowableType = (String) map.get("throwable_type");
+		_sThrowableMsg = (String) map.get("throwable_message");
+		_sThrowableStackTrace = (String) map.get("throwable_stacktrace");
+		_sProducer = (String) map.get("producer");
+		_sApplication = (String) map.get("application");
+		_sSource = (String) map.get("source");
+		_sLoggerName = (String) map.get("logger_name");
+		_sType = (String) map.get("type");
+		_date = (Date) map.get("date");
+		_sThread = (String) map.get("thread");
+		_level = LogLevel.valueOf((String) map.get("level"));
+		String sFilePath = (String) map.get("file_path");
+		if(sFilePath != null)
+			_filePath = Paths.get(sFilePath);
+	}
 
 }

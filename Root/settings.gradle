@@ -1,1 +1,1 @@
-include ':cube-logkeeper-core', ':cube-logkeeper-loggers', ':cube-logkeeper-delegates', ':cube-logkeeper-tomcat', ':cube-logkeeper-web-test', ':cube-logkeeper-slf4j', ':cube-logkeeper-watcher', ':cube-logkeeper-tomcat-test', ':cube-logkeeper-setter'
+include ':cube-logkeeper-core', ':cube-logkeeper-loggers', ':cube-logkeeper-delegates', ':cube-logkeeper-tomcat', ':cube-logkeeper-web-test', ':cube-logkeeper-slf4j', ':cube-logkeeper-watcher', ':cube-logkeeper-tomcat-test', ':cube-logkeeper-setter', ':cube-logkeeper-pipe-sender'
