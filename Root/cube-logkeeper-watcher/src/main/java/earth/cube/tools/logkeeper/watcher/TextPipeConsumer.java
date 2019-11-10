@@ -68,7 +68,7 @@ public class TextPipeConsumer extends Thread implements IConsumer {
 				throw new RuntimeException(e);
 		}
 		finally {
-			if(_bCloseIn)
+			if(_bCloseIn) {
 				try {
 					_in.close();
 				} catch (IOException e) {
@@ -77,6 +77,7 @@ public class TextPipeConsumer extends Thread implements IConsumer {
 					_file.close();
 				} catch (IOException e) {
 				}
+			}
 		}
 	}
 	

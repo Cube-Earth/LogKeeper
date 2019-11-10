@@ -25,7 +25,7 @@ jar {
 	    "Implementation-Title": project.name,
         "Implementation-Version": version,
         "Main-Class": "earth.cube.tools.logkeeper.watcher.Application",
-        "Class-Path": configurations.compile.collect { it.getName() }.join(' '),
+        "Class-Path": configurations.compile.collect { it.getName() }.join(' ') + " config/",
     )
   }
 }

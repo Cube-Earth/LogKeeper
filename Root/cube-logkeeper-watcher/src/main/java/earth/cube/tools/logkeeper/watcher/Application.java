@@ -69,11 +69,12 @@ public class Application {
 			throws JsonParseException, JsonMappingException, IOException {
 		if(configFile != null) {
 			_config = Config.read(configFile);
-			HealthCheck.createInstance(_config.getHealthConfig());
 		}
-		else
-			HealthCheck.createInstance(null);
-			
+		else {
+			_config = Config.read(getClass().getResourceAsStream("/LogKeeper.yml"));
+			if(_config == null)
+				throw new FileNotFoundException("Configuration file could not be found!");
+		}
 		_positions = new PositionTracker(trackerFile == null ? null : trackerFile.toFile());
 		_nHouseKeepingInterval = nHouseKeeperInterval;
 	}
@@ -115,6 +116,11 @@ public class Application {
 		}
 	}
 	
+	public void install() {
+		// After deserialization of each config element, needed directories / pipes
+		// are automatically created. So no explicit steps are required.
+	}
+	
 	private void startThreads() {
 		for(IConsumer thread : _threads) {
 			thread.start();
@@ -131,6 +137,8 @@ public class Application {
 	}
 
 	public void run() throws IOException, InterruptedException {
+		HealthCheck.createInstance(_config != null ? _config.getHealthConfig() : null);
+		
 		LogForwarder.get().connect();
 		_watcher = new DirWatcher(this);
 		_houseKeeper = new HouseKeeper(_nHouseKeepingInterval, this);
@@ -145,7 +153,9 @@ public class Application {
 		if(!_bShutdown) {
 			_bShutdown = true;
 			_watcher.close();
-			HealthCheck.getInstance().close();
+			
+			if(HealthCheck.getInstance() != null)
+				HealthCheck.getInstance().close();
 			if(_houseKeeper != null)
 				_houseKeeper.quit();
 			flush();
@@ -264,9 +274,10 @@ public class Application {
 	public static Options buildOptions() {
 		final Options options = new Options();
 		options.addOption("c", "config", true, "Path to configuration file")
-				.addOption("r", "recover", false, "recover internal database")
+				.addOption("r", "recover", false, "Recover internal database")
 				.addOption("t", "tracker", true, "Path to tracker file")
-				.addOption("i", "intervall", true, "House keeping interval (in sec)");
+				.addOption("i", "interval", true, "House keeping interval (in sec)")
+				.addOption(null, "install", false, "Install watcher (e.g. creating pipes and directories)");
 		return options;
 	}
 
@@ -301,6 +312,7 @@ public class Application {
 				String s = cmdLine.getOptionValue("config");
 				configFile = s == null || s.length() == 0 ? null : Paths.get(s);
 			}
+/*
 			if (configFile == null) {
 				String s = System.getProperty("LOGKEEPER_CONFIG");
 				if(s == null || s.length() == 0)
@@ -309,9 +321,13 @@ public class Application {
 			else
 				if (!Files.exists(configFile))
 					throw new FileNotFoundException(configFile.toString());
-
+*/
+			
 			Application app = new Application(configFile, trackerFile, nHouseKeepingInterval);
-			app.run();
+			if(cmdLine.hasOption("install"))
+				app.install();
+			else
+				app.run();
 		} catch (ShowHelpException e) {
 			System.out.println();
 			if (e.getCause() != null)

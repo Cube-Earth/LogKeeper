@@ -112,6 +112,7 @@ public class PipeSenderTest {
 	public static void tearDown() throws IOException, InterruptedException {
 		if(_watcher != null)
 			_watcher.close();
+		Thread.sleep(40000);
 	}
 	
 	private void waitForwarded() throws InterruptedException {
