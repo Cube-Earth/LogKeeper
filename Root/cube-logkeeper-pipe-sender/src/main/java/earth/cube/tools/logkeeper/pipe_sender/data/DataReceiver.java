@@ -44,8 +44,15 @@ public class DataReceiver {
 			
 			case DATE:
 				String sDate = _dataIn.readUTF();
-				Calendar c = DatatypeConverter.parseDateTime(sDate);
-				v = c.getTime();
+				try {
+					Calendar c = DatatypeConverter.parseDateTime(sDate);
+					v = c.getTime();
+				}
+				catch(IllegalArgumentException e) {
+					System.err.println("date = " + sDate);
+					e.printStackTrace();
+					v = null;
+				}
 				break;
 			
 			case STRING:

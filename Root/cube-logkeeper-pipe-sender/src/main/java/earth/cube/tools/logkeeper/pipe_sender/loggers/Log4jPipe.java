@@ -68,7 +68,7 @@ public class Log4jPipe extends AppenderSkeleton {
     	LogMessage msg = new LogMessage();
     	msg.setMessage(event.getMessage().toString());
 		msg.setThrowable(ti == null ? null : ti.getThrowable());
-		msg.setDate(event.getTimeStamp());
+		msg.setDate(event.timeStamp);
 		msg.setApplication(_sApplication);
 		msg.setLevel(transform(event.getLevel()));
 		msg.setLoggerName(event.getLoggerName());

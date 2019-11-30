@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.zeromq.ZMQ;
 
+import earth.cube.tools.logkeeper.core.Globals;
 import earth.cube.tools.logkeeper.core.LogMessage;
 import earth.cube.tools.logkeeper.core.utils.jackson.JsonEmitter;
 
@@ -32,6 +33,8 @@ public class ZmqForwarder implements ILogForwarder {
 
 	public void forward(LogMessage msg) {
         String sJson = _emitter.getJson(msg);
+        if(Globals.isVerbose())
+        	System.out.println("\n\n\n" + sJson);
         try {
 			_socket.send(sJson.getBytes("utf-8"), 0);
 		} catch (UnsupportedEncodingException e) {

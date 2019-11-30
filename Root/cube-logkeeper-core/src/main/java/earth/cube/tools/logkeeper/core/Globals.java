@@ -11,4 +11,14 @@ public class Globals {
 	
 	public static final int ZMQ_PORT = 2120;
 	
+	public static boolean _bVerbose;
+	
+	public static void setVerbose(boolean bVerbose) {
+		_bVerbose = bVerbose;
+	}
+	
+	public static boolean isVerbose() {
+		return _bVerbose;
+	}
+	
 }

@@ -46,10 +46,17 @@ public class DataSender {
 					break;
 				
 				case "java.util.Date":
-					_dataOut.writeByte(DataType.DATE.getValue());
 					Calendar c = Calendar.getInstance();
 					c.setTime((Date) v);
-					_dataOut.writeUTF(DatatypeConverter.printDateTime(c));
+					try {
+						String sDate = DatatypeConverter.printDateTime(c);
+						_dataOut.writeByte(DataType.DATE.getValue());
+						_dataOut.writeUTF(sDate);
+					}
+					catch(Throwable t) {
+						t.printStackTrace();
+						_dataOut.writeByte(DataType.NULL.getValue());
+					}
 					break;
 				
 				case "java.lang.String":

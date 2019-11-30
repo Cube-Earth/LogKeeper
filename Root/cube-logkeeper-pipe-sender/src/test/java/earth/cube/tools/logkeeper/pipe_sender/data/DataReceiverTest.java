@@ -32,6 +32,8 @@ public class DataReceiverTest {
 		map.put("int", Integer.MIN_VALUE);
 		map.put("str", "any\nvalue");
 		map.put("date", new Date());
+		map.put("date1", new Date(-1));
+		map.put("date2", null);
 		map.put("bool", true);
 		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();

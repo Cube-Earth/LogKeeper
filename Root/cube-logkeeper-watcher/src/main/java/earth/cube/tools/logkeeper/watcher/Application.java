@@ -24,7 +24,11 @@ import org.apache.logging.log4j.Logger;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import earth.cube.tools.logkeeper.core.Globals;
+import earth.cube.tools.logkeeper.core.LogLevel;
+import earth.cube.tools.logkeeper.core.LogMessage;
 import earth.cube.tools.logkeeper.core.forwarders.LogForwarder;
+import earth.cube.tools.logkeeper.pipe_sender.loggers.ScratchPipe;
 import earth.cube.tools.logkeeper.watcher.config.Config;
 import earth.cube.tools.logkeeper.watcher.config.ILogConfig;
 import earth.cube.tools.logkeeper.watcher.config.LinePatternConfig;
@@ -63,10 +67,16 @@ public class Application {
 	private int _nHouseKeepingInterval;
 
 	private boolean _bShutdown;
+
+	private boolean _bPing;
 	
 
-	public Application(Path configFile, Path trackerFile, int nHouseKeeperInterval)
+	public Application(Path configFile, Path trackerFile, int nHouseKeeperInterval, boolean bPing)
 			throws JsonParseException, JsonMappingException, IOException {
+		_bPing = bPing;
+		if(bPing)
+			Globals.setVerbose(true);
+		
 		if(configFile != null) {
 			_config = Config.read(configFile);
 		}
@@ -136,15 +146,53 @@ public class Application {
 		}
 	}
 
+	
+	private void printInitialized() {
+		LogMessage msg = new LogMessage();
+		msg.setMessage("started");
+		msg.setApplication("LogKeeper-Watcher");
+		msg.setLevel(LogLevel.INFO);
+		
+		LogForwarder.get().forward(msg);
+	}
+
+	
+	private void printInitialized2() {
+		for(ILogConfig cnf : _config.getLogConfigs()) {
+			switch(cnf.getConfigType()) {
+				case PIPE_STRUCTURED:
+					LogConfigStructuredPipe conf = (LogConfigStructuredPipe) cnf;
+					ScratchPipe pipe = new ScratchPipe(conf.getPath().toFile());
+					pipe.send("ping");
+					break;
+
+				case PIPE_TEXT:
+					break;
+				
+				default:
+					break;
+			}
+		}
+	}
+
+	
 	public void run() throws IOException, InterruptedException {
 		HealthCheck.createInstance(_config != null ? _config.getHealthConfig() : null);
 		
 		LogForwarder.get().connect();
+		
+		if(_bPing)
+			printInitialized();
+		
 		_watcher = new DirWatcher(this);
 		_houseKeeper = new HouseKeeper(_nHouseKeepingInterval, this);
 		_houseKeeper.start();
 		init();
 		startThreads();
+		
+		if(_bPing)
+			printInitialized2();
+
 		_houseKeeper.join();
 		close();
 	}
@@ -277,6 +325,8 @@ public class Application {
 				.addOption("r", "recover", false, "Recover internal database")
 				.addOption("t", "tracker", true, "Path to tracker file")
 				.addOption("i", "interval", true, "House keeping interval (in sec)")
+				.addOption("p", "ping", false, "Write ping(s) to pipes")
+				.addOption("h", "help", true, "Show help")
 				.addOption(null, "install", false, "Install watcher (e.g. creating pipes and directories)");
 		return options;
 	}
@@ -286,10 +336,10 @@ public class Application {
 															// sCommand
 		args.setOptions(buildOptions());
 		try {
-			if (saArgs.length == 0)
-				throw new ShowHelpException();
-
 			CommandLine cmdLine = args.parse(saArgs);
+
+			if (cmdLine.hasOption("h"))
+				throw new ShowHelpException();
 
 			Path trackerFile = null;
 			if (cmdLine.hasOption("tracker")) {
@@ -323,7 +373,7 @@ public class Application {
 					throw new FileNotFoundException(configFile.toString());
 */
 			
-			Application app = new Application(configFile, trackerFile, nHouseKeepingInterval);
+			Application app = new Application(configFile, trackerFile, nHouseKeepingInterval, cmdLine.hasOption("p"));
 			if(cmdLine.hasOption("install"))
 				app.install();
 			else

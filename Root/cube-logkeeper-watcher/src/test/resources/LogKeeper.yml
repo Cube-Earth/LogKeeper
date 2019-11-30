@@ -1,17 +1,8 @@
 logs:
-  - dir: /Users/user/tmp/log
-    glob: "*.log"
-    encoding: iso-8859-1
-    clean: true
-    source: JMS
-    type: tomcat80-stdout
+  - application: server3
+    source: structured1
+    type: structured_pipe
+    file: ./tmp/pipes/structured1
     create:
-      permissions: 770
-      owner: user
-    lines:
-    - pattern: "([0-9]{4}-[0-9]{2}-[0-9]{2}) ([a-zA-Z]) (.*)"
-      skip: false
-      fields:
-        date: "$1, date, yyyy-MM-dd HH:mm:ss, yyyy-MM-dd HH:mm:ss"
-        level: $2
-        msg: $3
+      permissions: 750
+      owner: joerg

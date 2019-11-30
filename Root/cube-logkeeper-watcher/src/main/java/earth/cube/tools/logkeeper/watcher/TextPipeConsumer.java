@@ -52,16 +52,20 @@ public class TextPipeConsumer extends Thread implements IConsumer {
 		}
 */
 
-		try(BufferedReader in = new BufferedReader(
-			    new InputStreamReader(_in))) {
-			try {
-				String sLine = in.readLine();
-				while(sLine != null) {
+		try(BufferedReader in = new BufferedReader(new InputStreamReader(_in))) {
+			String sLine = in.readLine();
+			while(sLine != null) {
+				try {
 					_concentrator.append(sLine);
 					sLine = in.readLine();
 				}
-			}
-			catch(ClosedByInterruptException e) {
+				catch(Throwable e) {
+					if(e.getCause() instanceof InterruptedException || e instanceof InterruptedIOException)
+						break;
+					else
+						if(!(e.getCause() instanceof ClosedByInterruptException))
+							e.printStackTrace();
+				}
 			}
 		} catch (IOException e) {
 			if(!(e.getCause() instanceof InterruptedException || e instanceof InterruptedIOException))

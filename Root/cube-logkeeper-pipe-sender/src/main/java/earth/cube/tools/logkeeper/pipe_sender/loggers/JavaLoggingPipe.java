@@ -32,7 +32,8 @@ public class JavaLoggingPipe extends Handler {
 		LogManager mgr = LogManager.getLogManager();
 		_sApplication = mgr.getProperty(sClassName + ".application");
 		_sSource = mgr.getProperty(sClassName + ".source");
-		_file = new File(mgr.getProperty(sClassName + ".file"));
+		String s = mgr.getProperty(sClassName + ".file");
+		_file = s == null ? null : new File(s);
 //	   setErrorManager(new ErrorManager());
 	}
 	

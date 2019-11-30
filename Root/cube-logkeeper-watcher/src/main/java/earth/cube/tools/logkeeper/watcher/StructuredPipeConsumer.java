@@ -38,13 +38,14 @@ public class StructuredPipeConsumer extends Thread implements IConsumer {
 					LogForwarder.get().forward(msg);
 					HealthCheck.getInstance().verify(msg);
 				}
-				catch(ClosedByInterruptException e) {
+				catch(Throwable e) {
+					if(e.getCause() instanceof InterruptedException || e instanceof InterruptedIOException)
+						break;
+					else
+						if(!(e.getCause() instanceof ClosedByInterruptException))
+							e.printStackTrace();
 				}
 			}
-		}
-		catch(IOException e) {
-			if(!(e.getCause() instanceof InterruptedException || e instanceof InterruptedIOException))
-				throw new RuntimeException(e);
 		}
 		finally {
 			try {

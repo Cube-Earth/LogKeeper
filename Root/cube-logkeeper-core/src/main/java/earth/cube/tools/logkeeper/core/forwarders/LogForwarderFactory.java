@@ -20,6 +20,8 @@ public class LogForwarderFactory {
 				}
 			}
 		});
+		if(Globals.isVerbose())
+			System.out.println(String.format("forwarder = %s, host = %s, port = %s", forwarder.getClass().getCanonicalName(), sHostName, nPort));
 		forwarder.setConnectInfo(sHostName, nPort);
 		return forwarder;
 	}

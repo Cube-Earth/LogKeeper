@@ -54,11 +54,14 @@ public class LogConfigTextPipe extends AbstractLogConfig {
 	public void afterDeserialization() {
 		super.afterDeserialization();
 		
-		for(LinePatternConfig lineConfig : new ArrayList<>(_pattern))
-			if(lineConfig.isInvalid()) {
-				_log.error("afterDeserialization: configuration entry is invalid and has been removed. text pattern: {}", lineConfig.getTextPattern());
-				_pattern.remove(lineConfig);
-			}
+		if(_pattern == null)
+			_pattern = new ArrayList<>();
+		else
+			for(LinePatternConfig lineConfig : new ArrayList<>(_pattern))
+				if(lineConfig.isInvalid()) {
+					_log.error("afterDeserialization: configuration entry is invalid and has been removed. text pattern: {}", lineConfig.getTextPattern());
+					_pattern.remove(lineConfig);
+				}
 		
 		FileUtil.createPipe(_file, _perms);
 	}
